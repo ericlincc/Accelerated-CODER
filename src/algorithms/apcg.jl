@@ -46,6 +46,7 @@ function apcg(
 
     # Run init
     iteration = 0
+    lastloggediter = 0
     exitflag = false
     starttime = time()
     results = Results()
@@ -53,24 +54,30 @@ function apcg(
     logresult!(results, 1, 0.0, init_optmeasure)
 
     while !exitflag
-        # Step 1
-        α, β, γ₊₁ = compute_stepsizes(m, γ, μ)
 
-        # Step 2
-        y = (α * γ * z + γ₊₁ * x) / (α * γ + γ₊₁)
+        for _ in 1:m
+            # Step 1
+            α, β, γ₊₁ = compute_stepsizes(m, γ, μ)
 
-        # Step 3
-        j = rand(1:problem.d)
-        grad_j = problem.loss_func.grad_block(y, j)
-        z₊₁ = (1 - β) * z + β * y
-        z₊₁[j] = problem.reg_func.prox_opr_block(z[j] - grad_j / (m * α), 1 / (m * α))
+            # Step 2
+            y = (α * γ * z + γ₊₁ * x) / (α * γ + γ₊₁)
 
-        # Step 4
-        x₊₁ = y + m * α * (z₊₁ - z) + μ / m * (z - y)
+            # Step 3
+            j = rand(1:problem.d)
+            grad_j = problem.loss_func.grad_block(y, j)
+            z₊₁ = (1 - β) * z + β * y
+            z₊₁[j] = problem.reg_func.prox_opr_block(z[j] - grad_j / (m * α), 1 / (m * α))
 
-        x, z = x₊₁, z₊₁
+            # Step 4
+            x₊₁ = y + m * α * (z₊₁ - z) + μ / m * (z - y)
+
+            x, z = x₊₁, z₊₁
+        end
+
+
         iteration += 1
-        if iteration % (m * exitcriterion.loggingfreq) == 0
+        if (iteration - lastloggediter) >= (exitcriterion.loggingfreq)
+            lastloggediter = iteration
             elapsedtime = time() - starttime
             optmeasure = problem.func_value(x)
             @info "elapsedtime: $elapsedtime, iteration: $(iteration), optmeasure: $(optmeasure)"

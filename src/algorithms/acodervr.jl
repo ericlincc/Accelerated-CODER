@@ -111,8 +111,8 @@ function acodervr(
 
         ỹ = ỹ_sum / K
         
-        iteration += m
-        if (iteration - lastloggediter) >= (m * exitcriterion.loggingfreq)
+        iteration += 5  # TODO: Check and verify
+        if (iteration - lastloggediter) >= (exitcriterion.loggingfreq)
             lastloggediter = iteration
             elapsedtime = time() - starttime
             optmeasure = problem.func_value(ỹ)

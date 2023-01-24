@@ -165,7 +165,7 @@ function acoder_adaptive(
         end
         
         iteration += m
-        if (iteration - lastloggediter) >= (m * exitcriterion.loggingfreq)
+        if (iteration - lastloggediter) >= (exitcriterion.loggingfreq)
             lastloggediter = iteration
             elapsedtime = time() - starttime
             optmeasure = problem.func_value(y)
