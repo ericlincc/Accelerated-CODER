@@ -39,6 +39,7 @@ function acoder(
     
     # Run init
     iteration = 0
+    lastloggediter = 0
     exitflag = false
     starttime = time()
     results = Results()
@@ -82,7 +83,8 @@ function acoder(
         end
         
         iteration += m
-        if iteration % (m * exitcriterion.loggingfreq) == 0
+        if (iteration - lastloggediter) >= (m * exitcriterion.loggingfreq)
+            lastloggediter = iteration
             elapsedtime = time() - starttime
             optmeasure = problem.func_value(y)
             @info "elapsedtime: $elapsedtime, iteration: $(iteration), optmeasure: $(optmeasure)"
@@ -118,6 +120,7 @@ function acoder_eff(
     
     # Run init
     iteration = 0
+    lastloggediter = 0
     exitflag = false
     starttime = time()
     results = Results()
@@ -161,8 +164,9 @@ function acoder_eff(
             y[j] = A₋₁ / A * y₋₁[j] + a / A * v[j]
         end
         
-        iteration += m
-        if iteration % (m * exitcriterion.loggingfreq) == 0
+        iteration += 2
+        if (iteration - lastloggediter) >= (m * exitcriterion.loggingfreq)
+            lastloggediter = iteration
             elapsedtime = time() - starttime
             optmeasure = problem.func_value(y)
             @info "elapsedtime: $elapsedtime, iteration: $(iteration), optmeasure: $(optmeasure)"
@@ -197,6 +201,7 @@ function acoder_adaptive(
     
     # Run init
     iteration = 0
+    lastloggediter = 0
     exitflag = false
     starttime = time()
     results = Results()
@@ -240,7 +245,8 @@ function acoder_adaptive(
         end
         
         iteration += m
-        if iteration % (m * exitcriterion.loggingfreq) == 0
+        if (iteration - lastloggediter) >= (m * exitcriterion.loggingfreq)
+            lastloggediter = iteration
             elapsedtime = time() - starttime
             optmeasure = problem.func_value(y)
             @info "elapsedtime: $elapsedtime, iteration: $(iteration), optmeasure: $(optmeasure)"

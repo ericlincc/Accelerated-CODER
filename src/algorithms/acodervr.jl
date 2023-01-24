@@ -50,6 +50,7 @@ function acodervr(
     
     # Run init
     iteration = 0
+    lastloggediter = 0
     exitflag = false
     starttime = time()
     results = Results()
@@ -111,7 +112,8 @@ function acodervr(
         ỹ = ỹ_sum / K
         
         iteration += m
-        if iteration % (m * exitcriterion.loggingfreq) == 0
+        if (iteration - lastloggediter) >= (m * exitcriterion.loggingfreq)
+            lastloggediter = iteration
             elapsedtime = time() - starttime
             optmeasure = problem.func_value(ỹ)
             @info "elapsedtime: $elapsedtime, iteration: $(iteration), optmeasure: $(optmeasure)"

@@ -70,6 +70,65 @@ function rcdm(
 end
 
 
+function rcdm_eff(
+    problem::CompositeFunc,
+    exitcriterion::ExitCriterion,
+    parameters::RCDMParams;
+    x₀=nothing
+    )
+
+    # Init of RCDM
+    Ls = parameters.Ls
+    α = parameters.α
+    if isnothing(x₀)
+        x₀ = zeros(problem.d)
+    end
+    x = copy(x₀)
+    m = problem.d  # Assume that each block is simply a coordinate for now
+
+    # Pre-compute sampling probabilities
+    L_probs = get_L_probs(Ls, α)
+
+    # Run init
+    iteration = 0
+    lastloggediter = 0
+    exitflag = false
+    starttime = time()
+    results = Results()
+    init_optmeasure = problem.func_value(x₀)
+    logresult!(results, 1, 0.0, init_optmeasure)
+
+    # Seeding
+    j = rand(L_probs)
+    grad_j, b_A_x = problem.loss_func.grad_block_update!(x, j)
+    Δxʲ = - grad_j / Ls[j]
+    x[j] = x[j] + Δxʲ
+
+    while !exitflag
+        for _ in 1:m
+            j₋₁ = j
+            j = rand(L_probs)
+            grad_j_loss, b_A_x = problem.loss_func.grad_block_update!(b_A_x, (j₋₁, Δxʲ), j)
+            grad_j = grad_j_loss + problem.reg_func.grad_block(x, j)
+            Δxʲ = - grad_j / Ls[j]
+            x[j] = x[j] + Δxʲ
+        end
+        
+        iteration += 1
+        if (iteration - lastloggediter) >= (exitcriterion.loggingfreq)
+            lastloggediter = iteration
+            elapsedtime = time() - starttime
+            optmeasure = problem.func_value(x)
+            @info "elapsedtime: $elapsedtime, iteration: $(iteration), optmeasure: $(optmeasure)"
+            logresult!(results, iteration, elapsedtime, optmeasure)
+            exitflag = checkexitcondition(exitcriterion, iteration, elapsedtime, optmeasure)
+        end
+    end
+
+    results
+end
+
+
 function rcdm_adapative(
     problem::CompositeFunc,
     exitcriterion::ExitCriterion,
