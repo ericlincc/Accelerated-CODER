@@ -4,6 +4,7 @@ struct LogisticLoss
     func_value::Function
     grad::Function
     grad_block::Function
+    grad_block_sample::Function
 
     function LogisticLoss(data::Data)
         n = length(data.values)
@@ -25,9 +26,17 @@ struct LogisticLoss
             return transpose(transpose(tmp) * A)
         end
         
-        # TODO: Check if there is a way to efficiently compute this
         function grad_block(x::Vector{Float64}, j)
             return grad(x)[j]
+        end
+
+        function grad_block_sample(x::Vector{Float64}, j, t)
+            a_x = 0.0
+            for i in 1:d
+                a_x += A[t, i] * x[i]
+            end
+            b_a_x = b[t] * a_x
+            return - b[t] * exp(-b_a_x) / (1 + exp(-b_a_x)) * A[t, j]
         end
 
         # TODO: What is this implementation?
@@ -43,6 +52,6 @@ struct LogisticLoss
             return transpose(A[:, grad_idx] .* b) * tmp / n
         end
         
-        new(n, d, func_value, grad, grad_block)
+        new(n, d, func_value, grad, grad_block, grad_block_sample)
     end
 end
