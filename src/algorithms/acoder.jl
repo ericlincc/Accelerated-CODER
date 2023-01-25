@@ -85,7 +85,7 @@ function acoder(
         end
         
         iteration += 2
-        if (iteration - lastloggediter) >= (m * exitcriterion.loggingfreq)
+        if (iteration - lastloggediter) >= (exitcriterion.loggingfreq)
             lastloggediter = iteration
             elapsedtime = time() - starttime
             optmeasure = problem.func_value(y)
