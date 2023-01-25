@@ -94,5 +94,5 @@ function coder(
         end
     end
 
-    results
+    results, y
 end

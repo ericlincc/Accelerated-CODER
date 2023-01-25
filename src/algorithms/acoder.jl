@@ -95,7 +95,7 @@ function acoder(
         end
     end
 
-    results
+    results, v, y
 end
 
 

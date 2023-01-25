@@ -43,5 +43,5 @@ function gd(
         end
     end
 
-    results
+    results, x
 end

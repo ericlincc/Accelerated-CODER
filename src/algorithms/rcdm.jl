@@ -79,7 +79,7 @@ function rcdm(
         end
     end
 
-    results
+    results, x
 end
 
 

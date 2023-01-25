@@ -159,7 +159,7 @@ if algorithm == "ACODER"
 
     acoder_params = ACODERParams(L, γ)
     output_acoder = acoder(problem, exitcriterion, acoder_params)
-    save_object(outputfilename, output_acoder)
+    save_object(outputfilename, (parsed_args, output_acoder))
     @info "output saved to $(outputfilename)"
 
 
@@ -171,7 +171,7 @@ elseif algorithm == "GD"
 
     gd_params = GDParams(L)
     output = gd(problem, exitcriterion, gd_params)
-    save_object(outputfilename, output)
+    save_object(outputfilename, (parsed_args, output))
     @info "output saved to $(outputfilename)"
 # elseif ARGS[2] == "CODERVR"
 #     @info "Running CODERVR..."

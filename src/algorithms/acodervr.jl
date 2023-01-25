@@ -43,9 +43,7 @@ function acodervr(
 
     # Seeding of ACODERVR
     z .= z₋₁ + ∇f(x₀)
-    for j in 1:m
-        v[j] = prox_opr_block_g(x₀[j] - z[j], A)
-    end
+    v = prox_opr_block_g.(x₀ - z, A)
     ỹ .= v; y .= v
     
     # Run init

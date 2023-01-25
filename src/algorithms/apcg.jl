@@ -86,5 +86,5 @@ function apcg(
         end
     end
 
-    results
+    results, x
 end
