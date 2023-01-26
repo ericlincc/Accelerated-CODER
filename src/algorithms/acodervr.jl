@@ -47,8 +47,8 @@ function acodervr(
     ỹ .= v; y .= v
     
     # Run init
-    iteration = 0
-    lastloggediter = 0
+    iteration = 0.0
+    lastloggediter = 0.0
     exitflag = false
     starttime = time()
     results = Results()
@@ -109,14 +109,16 @@ function acodervr(
 
         ỹ = ỹ_sum / K
         
-        iteration += 5  # TODO: Check and verify
+        iteration += 1 + 4 * K / problem.loss_func.n  # TODO: Check and verify
         if (iteration - lastloggediter) >= (exitcriterion.loggingfreq)
             lastloggediter = iteration
             elapsedtime = time() - starttime
             optmeasure = problem.func_value(ỹ)
-            @info "elapsedtime: $elapsedtime, iteration: $(iteration), optmeasure: $(optmeasure)"
+
+            _iteration = Int(ceil(iteration))
+            @info "elapsedtime: $elapsedtime, iteration: $(_iteration), optmeasure: $(optmeasure)"
             logresult!(results, iteration, elapsedtime, optmeasure)
-            exitflag = checkexitcondition(exitcriterion, iteration, elapsedtime, optmeasure)
+            exitflag = checkexitcondition(exitcriterion, _iteration, elapsedtime, optmeasure)
         end
     end
 

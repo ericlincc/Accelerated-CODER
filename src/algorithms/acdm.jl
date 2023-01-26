@@ -50,7 +50,7 @@ function acdm(
             γ = max(1 / m, acdm_stepsize(a, b, σ, m))
             α, β = (m - γ * σ) / (γ * (m^2 - σ)), 1 - γ * σ / m
             y .= α * v + (1 - α) * x 
-            j = rand(1:problem.d)  # TODO: Implement probability weight-based sampling
+            j = rand(1:problem.d)
             grad_j = problem.grad_block(y, j)
             x[j] = y[j] - grad_j / Ls[j]
             v .= β * v + (1 - β) * y

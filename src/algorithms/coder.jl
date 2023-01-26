@@ -33,6 +33,7 @@ function coder(
     q, w = zeros(length(x₀)), zeros(length(x₀))
     p = problem.loss_func.grad(x₀); p₋₁ = copy(p)
     z = zeros(problem.d); z₋₁ = copy(z)
+    loss_func_grad_x = copy(p)
     b_A_x = zeros(problem.loss_func.n)
     m = problem.d  # Assume that each block is simply a coordinate for now
     
@@ -60,11 +61,12 @@ function coder(
         x = A₋₁ / A * y + a / A * v
 
         w .= x
-        loss_func_grad_x₋₁ = problem.loss_func.grad(x₋₁)
+        loss_func_grad_x₋₁ = loss_func_grad_x
         for j in m:-1:1
             # Step 7
             if j == m
-                p[j], b_A_x = problem.loss_func.grad_block_update!(x, j)
+                loss_func_grad_x, b_A_x = problem.loss_func.grad_block_update!(x)
+                p[m] = loss_func_grad_x[m]
             else
                 p[j], b_A_x = problem.loss_func.grad_block_update!(b_A_x, (j+1, y[j+1] - x[j+1]), j)
             end

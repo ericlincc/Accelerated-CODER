@@ -41,7 +41,9 @@ DATASET_INFO = Dict([
     ("gisette_scale", (5000, 6000)),
     ("news20", (1355191, 19996)),
     ("rcv1", (47236, 20242)),
-    ("phishing", (68, 11055))
+    ("phishing", (68, 11055)),
+    ("colon-cancer", (2000, 62)),
+    ("madelon", (500, 2000)),
 ])
 
 
