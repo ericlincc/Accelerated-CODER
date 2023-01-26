@@ -3,6 +3,7 @@
 using ArgParse
 using CSV
 using Dates
+using Distributions
 using LinearAlgebra
 using Logging
 using SparseArrays
@@ -22,10 +23,13 @@ include("../src/problems/composite_func.jl")
 include("../src/algorithms/utils/exitcriterion.jl")
 include("../src/algorithms/utils/results.jl")
 
-# include("../src/algorithms/coder.jl")
+
 include("../src/algorithms/acoder.jl")
+include("../src/algorithms/acodervr.jl")
+include("../src/algorithms/coder.jl")
 # include("../src/algorithms/apcg.jl")
-# include("../src/algorithms/rcdm.jl")
+include("../src/algorithms/rcdm.jl")
+include("../src/algorithms/acdm.jl")
 include("../src/algorithms/gd.jl")
 
 
@@ -92,6 +96,7 @@ function parse_commandline()
             default = 0.0
         "--K"
             help = "Variance reduction K"
+            arg_type = Int64
             default = 0
     end
     return parse_args(s)
@@ -158,10 +163,58 @@ if algorithm == "ACODER"
     @info "Setting L=$(L), γ=$(γ)"
 
     acoder_params = ACODERParams(L, γ)
-    output_acoder = acoder(problem, exitcriterion, acoder_params)
-    save_object(outputfilename, (parsed_args, output_acoder))
+    output = acoder(problem, exitcriterion, acoder_params)
+    save_object(outputfilename, (parsed_args, output))
     @info "output saved to $(outputfilename)"
 
+elseif algorithm == "ACODER-VR"
+    @info "Running ACODER-VR..."
+
+    L = parsed_args["lipschitz"]
+    γ = parsed_args["gamma"]
+    K = parsed_args["K"]
+    @info "Setting L=$(L), γ=$(γ), K=$(K)"
+
+    acodervr_params = ACODERVRParams(L, γ, K)
+    output = acodervr(problem, exitcriterion, acodervr_params)
+    save_object(outputfilename, (parsed_args, output))
+    @info "output saved to $(outputfilename)"
+
+elseif algorithm == "CODER"
+    @info "Running CODER..."
+
+    L = parsed_args["lipschitz"]
+    γ = parsed_args["gamma"]
+    @info "Setting L=$(L), γ=$(γ)"
+
+    coder_params = CODERParams(L, γ)
+    output = coder(problem, exitcriterion, coder_params)
+    save_object(outputfilename, (parsed_args, output))
+    @info "output saved to $(outputfilename)"
+
+elseif algorithm == "RCDM"
+    @info "Running RCDM..."
+
+    Ls = ones(d) * parsed_args["lipschitz"]
+    α = 1.0  # Alpha does matter when uniform lipszhitz
+    @info "Setting L=$(parsed_args["lipschitz"]), α=$(α)"
+
+    rcdm_params = RCDMParams(Ls, α)
+    output = rcdm(problem, exitcriterion, rcdm_params)
+    save_object(outputfilename, (parsed_args, output))
+    @info "output saved to $(outputfilename)"
+
+elseif algorithm == "ACDM"
+    @info "Running ACDM..."
+
+    Ls = ones(d) * parsed_args["lipschitz"]
+    γ = parsed_args["gamma"]
+    @info "Setting L=$(parsed_args["lipschitz"]), γ=$(γ)"
+
+    acdm_params = ACDMParams(Ls, γ)
+    output = acdm(problem, exitcriterion, acdm_params)
+    save_object(outputfilename, (parsed_args, output))
+    @info "output saved to $(outputfilename)"
 
 elseif algorithm == "GD"
     @info "Running GD..."
@@ -173,19 +226,6 @@ elseif algorithm == "GD"
     output = gd(problem, exitcriterion, gd_params)
     save_object(outputfilename, (parsed_args, output))
     @info "output saved to $(outputfilename)"
-# elseif ARGS[2] == "CODERVR"
-#     @info "Running CODERVR..."
-
-#     L = parse(Float64, ARGS[3])
-#     γ = parse(Float64, ARGS[4])
-#     M = parse(Float64, ARGS[5])
-#     K = parse(Float64, ARGS[6])
-#     @info "Setting L=$(L), γ=$(γ), M=$(M), K=$(K)"
-
-#     codervr_params = CODERVRParams(L, M, γ, K)
-#     output_vrcoder = codervr(problem, exitcriterion, codervr_params)
-#     save_object(outputfilename, output_vrcoder)
-#     @info "output saved to $(outputfilename)"
 
 else
     @info "Wrong algorithm name supplied"

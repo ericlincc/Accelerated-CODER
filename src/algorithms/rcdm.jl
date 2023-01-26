@@ -134,7 +134,7 @@ function rcdm_adapative(
         Ls[j] = 0.5 * Ls[j]
         
         iteration += 2
-        if (iteration - lastloggediter) >= (m * exitcriterion.loggingfreq)
+        if (iteration - lastloggediter) >= (exitcriterion.loggingfreq)
             lastloggediter = iteration
             elapsedtime = time() - starttime
             optmeasure = problem.func_value(x)
