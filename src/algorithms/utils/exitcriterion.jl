@@ -24,6 +24,8 @@ function checkexitcondition(
         return true
     elseif measure <= exitcriterion.targetaccuracy
         return true
+    elseif isnan(measure)
+        return true
     end
 
     false
