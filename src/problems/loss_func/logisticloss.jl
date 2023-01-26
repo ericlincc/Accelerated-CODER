@@ -32,6 +32,15 @@ struct LogisticLoss
         end
 
         function grad_block_update!(
+            x::Vector{Float64}
+            )
+            A_x = A * x
+            b_A_x = b .* A_x
+            tmp = @. - b * exp(-b_A_x) / (exp(-b_A_x) + 1) / n
+            return transpose(transpose(tmp) * A), b_A_x
+        end
+
+        function grad_block_update!(
             x::Vector{Float64},
             j::Int64
             )
