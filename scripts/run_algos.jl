@@ -173,6 +173,9 @@ elseif algorithm == "ACODER-VR"
     L = parsed_args["lipschitz"]
     γ = parsed_args["gamma"]
     K = parsed_args["K"]
+    if K == 0
+        K = n
+    end
     @info "Setting L=$(L), γ=$(γ), K=$(K)"
 
     acodervr_params = ACODERVRParams(L, γ, K)
